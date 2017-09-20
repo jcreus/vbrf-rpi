@@ -6,6 +6,40 @@ import hmac
 import hashlib
 import time
 import threading
+import re
+import string
+
+def clean(s):
+    return filter(lambda x: x in (string.lowercase + "_"), s.lower())
+
+fmt = open('fmt.txt').read()
+
+a = re.findall(r'compressVariable\(data\.(.*?)\s*,\s*(\-*\d+)\s*,\s*(\-*\d+)\s*,\s*(\-*\d+)\s*,\s*lengthBits\);(.*?)$', fmt, re.MULTILINE)
+
+vars = []
+for var in a:
+    n = clean(var[0])
+    if var[4] != '':
+       n = var[4].replace('//','').rstrip().lstrip()
+    vars.append([n, int(var[1]), int(var[2]), int(var[3])])
+    print vars[-1]
+
+msg = "03412bef7c94ca662392245bff5ccca20000010445140000000176031831f101801443041c44000000000003c00608b00"
+inp = ""
+out = ["0000","0001",'0010','0011','0100','0101','0110','0111','1000','1001','1010','1011','1100','1101','1110','1111']
+for i in msg:
+    inp += out[int(i,16)]
+
+tot = 0
+for name, min, max, bits in vars:
+    x = inp[0:bits]
+    inp = inp[bits:] 
+    tot += bits
+    x = int(x, 2)
+    v = min + (max-min) * x / (2**bits - 1.)
+    print name, v
+print tot, tot/8.
+exit()
 
 lock = threading.Lock()
 lock.acquire()
@@ -52,7 +86,7 @@ lock.acquire()
 print "Okay, we're in business"
 
 import serial
-s = serial.Serial('/dev/ttyACM0', 115200)
+s = serial.Serial('/dev/ttyAMA0', 57600)
 
 rolling = []
 
@@ -66,11 +100,13 @@ def parse_message(msg):
     print "Parsing", msg
     try:
         msg = ''.join(map(chr, msg))
+
         sp = msg.split(',')
         ln = int(sp[0])
-        msg = ','.join(msg[1:])
+        msg = ','.join(sp[1:])
         print "actual thing received", msg[:ln]
         print "raw bytestring", msg[ln:]
+        ws.send(json.dumps({"id":str(uuid.uuid4()), "mission": 39, "timestamp": int(time.time()*1000), "raw": msg[ln:], "received": msg[:ln]}))
 
     except:
         print "Error parsing"
@@ -83,9 +119,8 @@ while True:
     if rolling == START:
         parsing = True
         message = []
-    if rolling == END:
+    elif rolling == END:
         parsing = False
         parse_message(message[:-3])
-
-    if parsing:
+    elif parsing:
         message.append(b)
