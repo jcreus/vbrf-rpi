@@ -6,12 +6,12 @@ import hmac
 import hashlib
 import time
 import threading
-import pandas as pd
-
-df = pd.read_hdf('/home/joan/valbal/datasets/ssi54/ssi54.h5', stop=1000)
 
 lock = threading.Lock()
 lock.acquire()
+
+count = 0
+recv = 0
 
 def whine(ws, error):
     print "[WS] Got error: "+str(error)
@@ -24,6 +24,11 @@ def opened(ws):
     lock.release()
 
 def msg(ws, message):
+    global count
+    if 'success' in message:
+        count += 1
+    if 'receive' in message:
+        recv += 1
     print "[WS] Got message", message
 
 def run_connection():
@@ -46,10 +51,41 @@ t.start()
 lock.acquire()
 print "Okay, we're in business"
 
-lst = df.to_dict('records')
-for i in range(1000):
-    print "Sending message"
-    dic = { "id":str(uuid.uuid4()), "mission":39, "timestamp": int(time.time()*1000)}
-    dic.update(lst[i])
-    ws.send(json.dumps(dic))
-    time.sleep(0.95)
+import serial
+s = serial.Serial('/dev/ttyACM0', 115200)
+
+rolling = []
+
+START = [204, 105, 119, 82]
+END = [162, 98, 128, 161]
+
+parsing = False
+message = []
+
+def parse_message(msg):
+    print "Parsing", msg
+    try:
+        msg = ''.join(map(chr, msg))
+        sp = msg.split(',')
+        ln = int(sp[0])
+        msg = ','.join(msg[1:])
+        print "actual thing received", msg[:ln]
+        print "raw bytestring", msg[ln:]
+
+    except:
+        print "Error parsing"
+
+while True:
+    b = ord(s.read(1))
+    rolling.append(b)
+    if len(rolling) > 4:
+        rolling = rolling[1:]
+    if rolling == START:
+        parsing = True
+        message = []
+    if rolling == END:
+        parsing = False
+        parse_message(message[:-3])
+
+    if parsing:
+        message.append(b)
