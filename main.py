@@ -21,6 +21,7 @@ for var in a:
     n = clean(var[0])
     if var[4] != '':
        n = var[4].replace('//','').rstrip().lstrip()
+    n = n.replace(' ','_')
     vars.append([n, int(var[1]), int(var[2]), int(var[3])])
     print vars[-1]
 
@@ -39,7 +40,7 @@ for name, min, max, bits in vars:
     v = min + (max-min) * x / (2**bits - 1.)
     print name, v
 print tot, tot/8.
-exit()
+#exit()
 
 lock = threading.Lock()
 lock.acquire()
@@ -52,6 +53,7 @@ def whine(ws, error):
 
 def ohp(ws):
     print "[WS] Connection unexpectedly dropped. Retrying..."
+    ws.close()
 
 def opened(ws):
     print "[WS] Connection opened"
@@ -102,13 +104,33 @@ def parse_message(msg):
         msg = ''.join(map(chr, msg))
 
         sp = msg.split(',')
-        ln = int(sp[0])
-        msg = ','.join(sp[1:])
-        print "actual thing received", msg[:ln]
-        print "raw bytestring", msg[ln:]
-        ws.send(json.dumps({"id":str(uuid.uuid4()), "mission": 39, "timestamp": int(time.time()*1000), "raw": msg[ln:], "received": msg[:ln]}))
+        rssi = ord(sp[0])
+        print sp
+        #ln = ord(sp[1])
+        ln = 60
+        msg = ','.join(sp[2:])
+        aa = msg[:ln]
+        inp = ""
+        for c in aa:
+           num = ord(c)
+           for i in [1,2,4,8,16,32,64,128][::-1]:
+              inp += ("1" if (num & i) else "0")
+        print inp
+        dd = {"id":str(uuid.uuid4()), "mission": 39, "timestamp": int(time.time()*1000), "raw": msg[ln:].encode('hex'), "received": msg[:ln].encode('hex')}
+        for name, min, max, bits in vars:
+            x = inp[0:bits]
+            inp = inp[bits:]
+            x = int(x, 2)
+            v = min + (max-min) * x / (2**bits - 1.)
+            dd[name] = v
+            print name, v
+        print dd.keys()
+        #print "actual thing received", msg[:ln]
+        #print "raw bytestring", msg[ln:]
+        
+        ws.send(json.dumps(dd))
 
-    except:
+    except ImportError:
         print "Error parsing"
 
 while True:
