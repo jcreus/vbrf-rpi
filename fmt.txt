@@ -1,26 +1,43 @@
-  lengthBits += compressVariable(data.TIME / 1000,                           0,    3000000, 20, lengthBits); // time
-  lengthBits += compressVariable(data.LAT_GPS,                              -90,   90,      21, lengthBits); // latitude
-  lengthBits += compressVariable(data.LONG_GPS,                             -180,  180,     22, lengthBits); // longitude
-  lengthBits += compressVariable(data.ALTITUDE_BAROMETER,                   -2000, 40000,   16, lengthBits); // altitude_barometer
-  lengthBits += compressVariable(data.ALTITUDE_GPS,                         -2000, 40000,   14, lengthBits);
-  lengthBits += compressVariable(data.ASCENT_RATE,                          -10,   10,      11, lengthBits);
-  lengthBits += compressVariable(data.VALVE_INCENTIVE,                      -50,   10,      12, lengthBits);
-  lengthBits += compressVariable(data.BALLAST_INCENTIVE,                    -50,   10,      12, lengthBits);
-  lengthBits += compressVariable(data.VALVE_STATE,                           0,    1,       1,  lengthBits);
-  lengthBits += compressVariable(data.BALLAST_STATE,                         0,    1,       1,  lengthBits);
-  lengthBits += compressVariable(data.VALVE_QUEUE / 1000,                    0,    1023,    10, lengthBits);
-  lengthBits += compressVariable(data.BALLAST_QUEUE / 1000,                  0,    1023,    10, lengthBits);
-  lengthBits += compressVariable(data.VALVE_TIME_TOTAL / 1000,               0,    16383,   13, lengthBits); // valve time total
-  lengthBits += compressVariable(data.BALLAST_TIME_TOTAL / 1000,             0,    16383,   13, lengthBits); // ballast time total
-  lengthBits += compressVariable(data.VALVE_NUM_ACTIONS,                     0,    63,      6,  lengthBits);
-  lengthBits += compressVariable(data.BALLAST_NUM_ACTIONS,                   0,    63,      6,  lengthBits);
-  lengthBits += compressVariable(data.VALVE_NUM_ATTEMPTS,                    0,    63,      6,  lengthBits);
-  lengthBits += compressVariable(data.BALLAST_NUM_ATTEMPTS,                  0,    63,      6,  lengthBits);
-  lengthBits += compressVariable(data.BALLAST_NUM_OVERCURRENTS,              0,    63,      6,  lengthBits);
-  lengthBits += compressVariable(data.CUTDOWN_STATE,                         0,    1,       1,  lengthBits);
-  lengthBits += compressVariable(data.MAX_CURRENT_CHARGING_LIMIT,            0,    3,       2,  lengthBits);
-  lengthBits += compressVariable(data.SYSTEM_POWER_STATE,                    0,    3,       2,  lengthBits);
-  lengthBits += compressVariable(data.TEMP_INT,                             -85,   65,      9,  lengthBits);
-  lengthBits += compressVariable(data.JOULES_TOTAL,                          0,    1572863, 18, lengthBits);
-  lengthBits += compressVariable(data.VOLTAGE_PRIMARY,                       0,    6,       9,  lengthBits);
-  lengthBits += compressVariable(data.VOLTAGE_SUPERCAP_AVG, 0, 6, 9, lengthBits);
+  payload.addVariable(data.TIME / 1000,                 0,    3000000, 20);
+  payload.addVariable(data.LAT_GPS,                    -90,   90,      21);
+  payload.addVariable(data.LONG_GPS,                   -180,  180,     22);
+  payload.addVariable(data.ALTITUDE_BAROMETER,         -2000, 40000,   16);
+  payload.addVariable(data.ALTITUDE_GPS,               -2000, 40000,   14);
+  payload.addVariable(data.ASCENT_RATE,                -10,   10,      11);
+  payload.addVariable(data.VALVE_INCENTIVE,            -50,   10,      12);
+  payload.addVariable(data.BALLAST_INCENTIVE,          -50,   10,      12);
+  payload.addVariable(data.VALVE_STATE,                 0,    1,        1);
+  payload.addVariable(data.BALLAST_STATE,               0,    1,        1);
+  payload.addVariable(data.VALVE_QUEUE / 1000,          0,    1023,    10);
+  payload.addVariable(data.BALLAST_QUEUE / 1000,        0,    1023,    10);
+  payload.addVariable(data.VALVE_TIME_TOTAL / 1000,     0,    16383,   13);
+  payload.addVariable(data.BALLAST_TIME_TOTAL / 1000,   0,    16383,   13);
+  payload.addVariable(data.VALVE_NUM_ACTIONS,           0,    63,       6);
+  payload.addVariable(data.BALLAST_NUM_ACTIONS,         0,    63,       6);
+  payload.addVariable(data.VALVE_NUM_ATTEMPTS,          0,    63,       6);
+  payload.addVariable(data.BALLAST_NUM_ATTEMPTS,        0,    63,       6);
+  payload.addVariable(data.BALLAST_NUM_OVERCURRENTS,    0,    63,       6);
+  payload.addVariable(data.CUTDOWN_STATE,               0,    1,        1);
+  payload.addVariable(data.MAX_CURRENT_CHARGING_LIMIT,  0,    3,        2);
+  payload.addVariable(data.SYSTEM_POWER_STATE,          0,    3,        2);
+  payload.addVariable(data.TEMP_INT,                   -85,   65,       9);
+  payload.addVariable(data.JOULES_TOTAL,                0,    1572863, 18);
+  payload.addVariable(data.VOLTAGE_PRIMARY,             0,    6,        9);
+  payload.addVariable(data.VOLTAGE_SUPERCAP_AVG,        0,    6,        9);
+  payload.addVariable(data.CURRENT_TOTAL_AVG,                     0,    4095,    12);
+  payload.addVariable(data.CURRENT_TOTAL_MIN,                     0,    4095,    12);
+  payload.addVariable(data.CURRENT_TOTAL_MAX,                     0,    4095,    12);
+  payload.addVariable(data.CURRENT_RB_AVG,                        0,    1023,    8);
+  payload.addVariable(data.CURRENT_RB_MAX,                        0,    1023,    8);
+  payload.addVariable(data.CURRENT_MOTOR_VALVE_AVG,               0,    1023,    8);
+  payload.addVariable(data.CURRENT_MOTOR_VALVE_MAX,               0,    1023,    8);
+  payload.addVariable(data.CURRENT_MOTOR_BALLAST_AVG,             0,    1023,    8);
+  payload.addVariable(data.CURRENT_MOTOR_BALLAST_MAX,             0,    1023,    8);
+  payload.addVariable(data.CURRENT_PAYLOAD_AVG,                   0,    1023,    8);
+  payload.addVariable(data.CURRENT_PAYLOAD_MAX,                   0,    1023,    8);
+  payload.addVariable(data.TEMP_EXT,                             -100,  30,      8);
+  payload.addVariable(data.LOOP_TIME_MAX,                         0,    10239,   10);
+  payload.addVariable(data.RB_SENT_COMMS,                         0,    8191,    13);
+  payload.addVariable(data.RESISTOR_MODE,                         0,    4,       3);
+  payload.addVariable(data.MANUAL_MODE,                           0,    1,       1);
+  payload.addVariable(data.REPORT_MODE,                           0,    2,       2);

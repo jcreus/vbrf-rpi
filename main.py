@@ -14,8 +14,9 @@ def clean(s):
 
 fmt = open('fmt.txt').read()
 
-a = re.findall(r'compressVariable\(data\.(.*?)\s*,\s*(\-*\d+)\s*,\s*(\-*\d+)\s*,\s*(\-*\d+)\s*,\s*lengthBits\);(.*?)$', fmt, re.MULTILINE)
+a = re.findall(r'addVariable\(data\.(.*?)\s*,\s*(\-*\d+)\s*,\s*(\-*\d+)\s*,\s*(\-*\d+)\s*\);(.*?)$', fmt, re.MULTILINE)
 
+print a
 vars = []
 for var in a:
     n = clean(var[0])
@@ -25,7 +26,7 @@ for var in a:
     vars.append([n, int(var[1]), int(var[2]), int(var[3])])
     print vars[-1]
 
-msg = "03412bef7c94ca662392245bff5ccca20000010445140000000176031831f101801443041c44000000000003c00608b00"
+msg = "03412bef7c94ca662392245bff5ccca20000010445140000000176031831f101801443041c44000000000003c00608b0003412bef7c94ca662392245bff5ccca20000010445140000000176031831f101801443041c44000000000003c00608b00"
 inp = ""
 out = ["0000","0001",'0010','0011','0100','0101','0110','0111','1000','1001','1010','1011','1100','1101','1110','1111']
 for i in msg:
@@ -40,7 +41,6 @@ for name, min, max, bits in vars:
     v = min + (max-min) * x / (2**bits - 1.)
     print name, v
 print tot, tot/8.
-#exit()
 
 lock = threading.Lock()
 lock.acquire()
