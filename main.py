@@ -9,6 +9,19 @@ import threading
 import re
 import string
 
+last_message = time.time()
+
+def heartbeat():
+    while True:
+        if time.time() - last_message  > 16:
+            print "heartbeat violation!"
+            os._exit(1)
+        time.sleep(1)
+
+t = threading.Thread(target=heartbeat)
+t.daemon = True
+t.start()
+
 def clean(s):
     return filter(lambda x: x in (string.lowercase + "_"), s.lower())
 
@@ -66,6 +79,8 @@ def msg(ws, message):
     if 'receive' in message:
         recv += 1
     print "[WS] Got message", message
+    global last_message
+    last_message = time.time()
 
 def run_connection():
     global ws
@@ -116,7 +131,7 @@ def parse_message(msg):
            for i in [1,2,4,8,16,32,64,128][::-1]:
               inp += ("1" if (num & i) else "0")
         print inp
-        dd = {"id":str(uuid.uuid4()), "mission": 39, "timestamp": int(time.time()*1000), "raw": msg[ln:].encode('hex'), "received": msg[:ln].encode('hex')}
+        dd = {"id":str(uuid.uuid4()), "mission": 40, "timestamp": int(time.time()*1000), "raw": msg[ln:].encode('hex'), "received": msg[:ln].encode('hex')}
         for name, min, max, bits in vars:
             x = inp[0:bits]
             inp = inp[bits:]
